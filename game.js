@@ -18,6 +18,9 @@ class Game {
         this.gold = 75; // Reduced starting gold for more challenge
         this.isPaused = false;
         this.gameStarted = false; // Start with ready prompt
+        this.showingExploreUI = false; // New state for UI exploration
+        this.preparationPhase = false; // New preparation phase
+        this.preparationTimer = 0; // Timer for preparation phase
         this.level = 1;
         this.wave = 1;
         this.castleHealth = 100;
@@ -77,24 +80,32 @@ class Game {
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
 
-        // Handle start button
-        if (!this.gameStarted && this.startButton) {
+        // Handle start button (initial screen)
+        if (!this.gameStarted && !this.showingExploreUI && this.startButton) {
             if (x >= this.startButton.x && x <= this.startButton.x + this.startButton.width &&
                 y >= this.startButton.y && y <= this.startButton.y + this.startButton.height) {
-                this.gameStarted = true;
+                this.showingExploreUI = true;
                 this.startButton = null;
-                // Start the first wave immediately after clicking start
-                setTimeout(() => {
-                    if (!this.waveInProgress && this.enemies.length === 0) {
-                        this.spawnWave();
-                    }
-                }, 1000); // Small delay to let the ready screen fade
                 return;
             }
         }
 
-        // Don't handle other clicks if game hasn't started
-        if (!this.gameStarted) return;
+        // Handle "Are You Ready?" button
+        if (this.showingExploreUI && this.readyButton) {
+            if (x >= this.readyButton.x && x <= this.readyButton.x + this.readyButton.width &&
+                y >= this.readyButton.y && y <= this.readyButton.y + this.readyButton.height) {
+                this.gameStarted = true;
+                this.showingExploreUI = false;
+                this.readyButton = null;
+                // Start preparation phase
+                this.preparationPhase = true;
+                this.preparationTimer = 10.0; // 10 seconds to prepare
+                return;
+            }
+        }
+
+        // Don't handle other clicks if game hasn't started (but allow during preparation and UI exploration)
+        if (!this.gameStarted && !this.preparationPhase && !this.showingExploreUI) return;
 
         // Handle tower removal
         if (this.selectedTower === 'remove') {
@@ -245,8 +256,8 @@ class Game {
     }
 
     handleKeyPress(event) {
-        // Only handle keys if game has started
-        if (!this.gameStarted) return;
+        // Only handle keys if game has started, during preparation, or exploring UI
+        if (!this.gameStarted && !this.preparationPhase && !this.showingExploreUI) return;
 
         switch (event.key) {
             case '1':
@@ -511,8 +522,10 @@ class Game {
             tower.draw(this.ctx);
         });
 
-        // Draw tower placement preview
-        this.drawTowerPlacementPreview();
+        // Draw tower placement preview (works during preparation, normal gameplay, and UI exploration)
+        if (this.gameStarted || this.preparationPhase || this.showingExploreUI) {
+            this.drawTowerPlacementPreview();
+        }
 
         // Update and draw damage texts
         this.damageTexts = this.damageTexts.filter(damageText => {
@@ -591,15 +604,33 @@ class Game {
             this.updateHUD();
         }
 
-        // Start first wave (only if game has started and no wave is in progress)
-        if (!this.waveInProgress && this.enemies.length === 0 && this.gameStarted && this.wave === 1) {
-            console.log('Starting first wave:', this.wave); // Debug log
+        // Handle preparation phase
+        if (this.preparationPhase && this.preparationTimer > 0) {
+            this.preparationTimer -= deltaTime;
+            this.drawPreparationScreen();
+
+            // Start first wave when preparation time is up
+            if (this.preparationTimer <= 0) {
+                this.preparationPhase = false;
+                console.log('Preparation complete, starting first wave:', this.wave);
+                this.spawnWave();
+            }
+        }
+
+        // Start subsequent waves (only if game has started and no wave is in progress)
+        if (!this.waveInProgress && this.enemies.length === 0 && this.gameStarted && this.wave > 1 && !this.preparationPhase) {
+            console.log('Starting wave:', this.wave); // Debug log
             this.spawnWave();
         }
 
         // Show ready prompt if game hasn't started
-        if (!this.gameStarted) {
+        if (!this.gameStarted && !this.showingExploreUI) {
             this.drawReadyPrompt();
+        }
+
+        // Show UI exploration screen
+        if (this.showingExploreUI) {
+            this.drawExploreUIScreen();
         }
 
         // Update and draw level complete screen
@@ -768,6 +799,92 @@ class Game {
 
         // Store button bounds for click detection (use original size for easier clicking)
         this.startButton = { x: buttonX, y: buttonY, width: buttonWidth, height: buttonHeight };
+    }
+
+    drawExploreUIScreen() {
+        // Draw semi-transparent overlay (lighter so UI is visible)
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+        // Draw title
+        this.ctx.fillStyle = '#FFD700';
+        this.ctx.font = 'bold 42px Arial';
+        this.ctx.textAlign = 'center';
+        this.ctx.fillText('🎮 EXPLORE THE GAME 🎮', this.canvas.width / 2, this.canvas.height / 2 - 120);
+
+        // Draw instructions
+        this.ctx.fillStyle = '#FFF';
+        this.ctx.font = '18px Arial';
+        this.ctx.fillText('Take your time to explore the tower options!', this.canvas.width / 2, this.canvas.height / 2 - 70);
+        this.ctx.fillText('🏹 Click tower buttons to see their stats', this.canvas.width / 2, this.canvas.height / 2 - 45);
+        this.ctx.fillText('🎯 Hover over the battlefield to see placement preview', this.canvas.width / 2, this.canvas.height / 2 - 20);
+        this.ctx.fillText('⌨️ Try the keyboard shortcuts (1-5, R, P)', this.canvas.width / 2, this.canvas.height / 2 + 5);
+
+        // Draw encouragement
+        this.ctx.fillStyle = '#00BCD4';
+        this.ctx.font = '16px Arial';
+        this.ctx.fillText('No rush! Enemies won\'t spawn until you\'re ready.', this.canvas.width / 2, this.canvas.height / 2 + 40);
+
+        // Draw "Are You Ready?" button
+        const buttonWidth = 280;
+        const buttonHeight = 60;
+        const buttonX = this.canvas.width / 2 - buttonWidth / 2;
+        const buttonY = this.canvas.height / 2 + 80;
+
+        // Button animation (slower pulse)
+        const pulse = Math.sin(Date.now() / 500) * 0.05 + 1;
+        const animButtonWidth = buttonWidth * pulse;
+        const animButtonHeight = buttonHeight * pulse;
+        const animButtonX = this.canvas.width / 2 - animButtonWidth / 2;
+        const animButtonY = buttonY + (buttonHeight - animButtonHeight) / 2;
+
+        // Button glow
+        this.ctx.shadowColor = '#e74c3c';
+        this.ctx.shadowBlur = 15;
+        this.ctx.fillStyle = '#e74c3c';
+        this.ctx.fillRect(animButtonX, animButtonY, animButtonWidth, animButtonHeight);
+
+        this.ctx.shadowBlur = 0;
+        this.ctx.strokeStyle = '#c0392b';
+        this.ctx.lineWidth = 4;
+        this.ctx.strokeRect(animButtonX, animButtonY, animButtonWidth, animButtonHeight);
+
+        this.ctx.fillStyle = '#FFF';
+        this.ctx.font = 'bold 24px Arial';
+        this.ctx.fillText('⚔️ ARE YOU READY? ⚔️', this.canvas.width / 2, buttonY + 38);
+
+        // Store button bounds for click detection
+        this.readyButton = { x: buttonX, y: buttonY, width: buttonWidth, height: buttonHeight };
+    }
+
+    drawPreparationScreen() {
+        // Draw semi-transparent overlay
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+        // Draw preparation title
+        this.ctx.fillStyle = '#FFD700';
+        this.ctx.font = 'bold 48px Arial';
+        this.ctx.textAlign = 'center';
+        this.ctx.fillText('⚡ PREPARE FOR BATTLE! ⚡', this.canvas.width / 2, this.canvas.height / 2 - 80);
+
+        // Draw countdown timer
+        const timeLeft = Math.ceil(this.preparationTimer);
+        this.ctx.fillStyle = timeLeft <= 3 ? '#FF5722' : '#4CAF50';
+        this.ctx.font = 'bold 72px Arial';
+        this.ctx.fillText(timeLeft.toString(), this.canvas.width / 2, this.canvas.height / 2 - 10);
+
+        // Draw instructions
+        this.ctx.fillStyle = '#FFF';
+        this.ctx.font = '20px Arial';
+        this.ctx.fillText('🏗️ Build your towers now!', this.canvas.width / 2, this.canvas.height / 2 + 40);
+        this.ctx.font = '16px Arial';
+        this.ctx.fillText('Enemies will start spawning when the timer reaches 0', this.canvas.width / 2, this.canvas.height / 2 + 70);
+
+        // Draw hotkey reminder
+        this.ctx.fillStyle = '#00BCD4';
+        this.ctx.font = '14px Arial';
+        this.ctx.fillText('Use hotkeys 1-5 to quickly select towers', this.canvas.width / 2, this.canvas.height / 2 + 100);
     }
 
     showLevelComplete() {
@@ -1773,12 +1890,4 @@ class Enemy {
 window.addEventListener('load', () => {
     console.log('Window loaded, starting game...');
     window.game = new Game();
-
-    // Force first wave spawn
-    setTimeout(() => {
-        if (window.game && !window.game.waveInProgress) {
-            console.log('Forcing first wave spawn...');
-            window.game.spawnWave();
-        }
-    }, 1000);
 });
