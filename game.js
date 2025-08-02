@@ -83,6 +83,12 @@ class Game {
                 y >= this.startButton.y && y <= this.startButton.y + this.startButton.height) {
                 this.gameStarted = true;
                 this.startButton = null;
+                // Start the first wave immediately after clicking start
+                setTimeout(() => {
+                    if (!this.waveInProgress && this.enemies.length === 0) {
+                        this.spawnWave();
+                    }
+                }, 1000); // Small delay to let the ready screen fade
                 return;
             }
         }
@@ -566,7 +572,7 @@ class Game {
         }
 
         // Check if wave is complete
-        if (this.waveInProgress && this.enemies.length === 0) {
+        if (this.waveInProgress && this.enemies.length === 0 && this.gameStarted) {
             console.log('Wave completed'); // Debug log
             this.waveInProgress = false;
             this.bossWave = false;
@@ -585,9 +591,9 @@ class Game {
             this.updateHUD();
         }
 
-        // Start first wave (only if game has started)
-        if (!this.waveInProgress && this.enemies.length === 0 && this.gameStarted) {
-            console.log('Starting wave:', this.wave); // Debug log
+        // Start first wave (only if game has started and no wave is in progress)
+        if (!this.waveInProgress && this.enemies.length === 0 && this.gameStarted && this.wave === 1) {
+            console.log('Starting first wave:', this.wave); // Debug log
             this.spawnWave();
         }
 
