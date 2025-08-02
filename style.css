@@ -1,0 +1,248 @@
+body {
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: #2c3e50;
+    font-family: Arial, sans-serif;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAmZJREFUWEftVj1s00AY/c7GbhJKWwQDBRVVoqqqqi0wICQGJFgYYEBiYmJkQEiMDIiJDYkBgcSAwMDA0IGBloGBoQNDB1RVVaUKVaiqqqpQm1/bd2SxjR3HdpwmQYLbnOT73rt7733fJ4YVP2zF8eM/AZBSRuSOQoibcshQKaV+fZBS3hRCPPpbAEkpHwohHgsh1qWUtwB8BbCplHoNQM8PDNu2dwDcB/AewCOl1Hu9P0wAlmVdArAH4COAbqVSealHmqa5C2APwBcAu0qpvt5PAxgKJKW8DuA5gG8AbvgkklJexIN4DuCGUurHMAC/BVLKMwDuAngWb3QAvPCDm6Z5GcBdKeUbAE9jEN8BbCulPvtSJMcgpcwDeBDUuFAo5BzHyRmGsQbgzK8kBXA2iqIrANZc193KZrOuaZr5fD6/0ev1nFwud47+pJQFAFsAusVisdbv9zOWZZ0GUAbQymazRdd1C4ZhFLrd7kagBWEAGTz0WPu+3263p+bFsqx1AJf1vNPppABorVar0+9GHPwsgNMAzheLxTyl0O12T4Ru4ykAMXnOATgf+1gvFAobANYBnItVdA7AuWKxuOG67kbcptOu664bhnHStu0T+Xz+ZLfbrQRKELUgBmAC2Izb7DiOU2k2m5Ner+dks9liPp8vRVF0wjTNYqlUKnU6nYpt2ye73W6l2WxOAJQBVJRSH6YAJDnwQ7GmlJpIKU/FICoATnmed8wCEDchj64DqFJBQogfPgApZRlAFUBVKTUZVQtmAXgSA5iopUoQhyy3bXut0WiM+75/zPO8csz+eq1Wq8+zB4fSgt+1YZ7NJ2+vHICf3UOvXjoFfwAqaHAhJmGF/AAAAABJRU5ErkJggg==');
+    background-repeat: repeat;
+}
+
+.game-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 800px;
+    margin: 0 auto;
+}
+
+.hud {
+    width: 800px;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 5px;
+    color: white;
+}
+
+.resources {
+    display: flex;
+    justify-content: space-around;
+    font-size: 1.2em;
+}
+
+#gameCanvas {
+    border: 2px solid #34495e;
+    background: #8dba84;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    width: 800px;
+    height: 600px;
+    display: block;
+    margin: 0 auto;
+}
+
+.tower-menu {
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(30, 30, 30, 0.9));
+    padding: 20px;
+    border-radius: 15px;
+    color: white;
+    text-align: center;
+    border: 2px solid #444;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.tower-menu h3 {
+    margin: 0 0 15px 0;
+    font-size: 20px;
+    color: #FFD700;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.tower-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.tower-button {
+    padding: 12px;
+    background: linear-gradient(145deg, #4a4a4a, #2a2a2a);
+    border: 2px solid #666;
+    border-radius: 10px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 80px;
+    font-family: Arial, sans-serif;
+}
+
+.tower-icon {
+    font-size: 24px;
+    margin-bottom: 4px;
+}
+
+.tower-name {
+    font-weight: bold;
+    font-size: 12px;
+    margin-bottom: 2px;
+}
+
+.tower-cost {
+    font-size: 11px;
+    color: #FFD700;
+    font-weight: bold;
+}
+
+.tower-hotkey {
+    position: absolute;
+    top: 2px;
+    right: 4px;
+    font-size: 10px;
+    color: #aaa;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 1px 3px;
+    border-radius: 3px;
+}
+
+.tower-button::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to right, transparent, rgba(255,255,255,0.2), transparent);
+    transition: 0.5s;
+}
+
+.tower-button:hover::after {
+    left: 100%;
+}
+
+.tower-button:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.tower-button:active {
+    transform: translateY(0);
+}
+
+.tower-button:disabled {
+    background: #7f8c8d;
+    border-color: #95a5a6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.tower-button.remove {
+    background: #e74c3c;
+    border-color: #c0392b;
+}
+
+.tower-button.remove:hover {
+    background: #c0392b;
+}
+
+.tower-button.basic {
+    background: linear-gradient(145deg, #27ae60, #219a52);
+    border-color: #1e8449;
+}
+
+.tower-button.basic:hover {
+    background: linear-gradient(145deg, #2ecc71, #27ae60);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(39, 174, 96, 0.4);
+}
+
+.tower-button.power {
+    background: linear-gradient(145deg, #e67e22, #d35400);
+    border-color: #ba4a00;
+}
+
+.tower-button.power:hover {
+    background: linear-gradient(145deg, #f39c12, #e67e22);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(230, 126, 34, 0.4);
+}
+
+.tower-button.freeze {
+    background: linear-gradient(145deg, #3498db, #2980b9);
+    border-color: #21618c;
+}
+
+.tower-button.freeze:hover {
+    background: linear-gradient(145deg, #5dade2, #3498db);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
+}
+
+.tower-button.cannon {
+    background: linear-gradient(145deg, #8b4513, #654321);
+    border-color: #4a2c17;
+}
+
+.tower-button.cannon:hover {
+    background: linear-gradient(145deg, #a0522d, #8b4513);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(139, 69, 19, 0.4);
+}
+
+.tower-button.lightning {
+    background: linear-gradient(145deg, #9c27b0, #7b1fa2);
+    border-color: #6a1b9a;
+}
+
+.tower-button.lightning:hover {
+    background: linear-gradient(145deg, #ba68c8, #9c27b0);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(156, 39, 176, 0.4);
+}
+
+.tower-button.selected {
+    background: linear-gradient(145deg, #1abc9c, #16a085) !important;
+    border-color: #0e6b5c !important;
+    box-shadow: 0 0 20px rgba(26, 188, 156, 0.8), inset 0 0 10px rgba(255, 255, 255, 0.2);
+    transform: translateY(-3px) scale(1.05);
+}
+
+.tower-button.selected .tower-hotkey {
+    background: rgba(255, 215, 0, 0.8);
+    color: #000;
+}
+
+.pause-button {
+    padding: 8px 16px;
+    background: #e74c3c;
+    border: 2px solid #c0392b;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s;
+    margin-left: 20px;
+}
+
+.pause-button:hover {
+    background: #c0392b;
+    transform: translateY(-1px);
+}
+
+.pause-button.paused {
+    background: #27ae60;
+    border-color: #219a52;
+}
+
+.pause-button.paused:hover {
+    background: #219a52;
+}

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tower Defense</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <div class="hud">
+            <div class="resources">
+                <div class="gold">Gold: <span id="goldCount">75</span></div>
+                <div class="wave">Wave: <span id="waveCount">1</span></div>
+                <div class="level">Level: <span id="levelCount">1</span></div>
+                <div class="health">Tower Health: <span id="castleHealth">100</span></div>
+                <button id="pauseButton" class="pause-button">Pause</button>
+            </div>
+        </div>
+        <canvas id="gameCanvas"></canvas>
+        <div class="tower-menu">
+            <h3>🏗️ Tower Arsenal</h3>
+            <div class="tower-grid">
+                <button id="basicTower" class="tower-button basic" title="Hotkey: 1">
+                    <span class="tower-icon">🏹</span>
+                    <span class="tower-name">Archer</span>
+                    <span class="tower-cost">50g</span>
+                    <span class="tower-hotkey">[1]</span>
+                </button>
+                <button id="powerTower" class="tower-button power" title="Hotkey: 2">
+                    <span class="tower-icon">⚔️</span>
+                    <span class="tower-name">Knight</span>
+                    <span class="tower-cost">100g</span>
+                    <span class="tower-hotkey">[2]</span>
+                </button>
+                <button id="freezeTower" class="tower-button freeze" title="Hotkey: 3">
+                    <span class="tower-icon">❄️</span>
+                    <span class="tower-name">Ice Mage</span>
+                    <span class="tower-cost">150g</span>
+                    <span class="tower-hotkey">[3]</span>
+                </button>
+                <button id="cannonTower" class="tower-button cannon" title="Hotkey: 4">
+                    <span class="tower-icon">💣</span>
+                    <span class="tower-name">Cannon</span>
+                    <span class="tower-cost">120g</span>
+                    <span class="tower-hotkey">[4]</span>
+                </button>
+                <button id="lightningTower" class="tower-button lightning" title="Hotkey: 5">
+                    <span class="tower-icon">⚡</span>
+                    <span class="tower-name">Lightning</span>
+                    <span class="tower-cost">180g</span>
+                    <span class="tower-hotkey">[5]</span>
+                </button>
+                <button id="removeTower" class="tower-button remove" title="Hotkey: R">
+                    <span class="tower-icon">🗑️</span>
+                    <span class="tower-name">Remove</span>
+                    <span class="tower-cost">Free</span>
+                    <span class="tower-hotkey">[R]</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <script src="game.js"></script>
+</body>
+</html>
